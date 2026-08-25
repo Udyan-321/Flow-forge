@@ -1,36 +1,27 @@
 import {Handle , Position , useReactFlow} from "@xyflow/react"
+import "./nodes.css"
 
 function AiReviewNode({id ,data} : {id : string ; data :{ label :string ; repo?: string ;runStatus?:string}})
 {
  const {deleteElements} = useReactFlow();
 
- const borderColor = data.runStatus === "started" ? "orange"
-  : data.runStatus === "completed" ? "green"
-  : data.runStatus === "failed" ? "red"
-  : "#b8932641"; 
 return(
-    <div style={{
-        padding : "10px 15px",
-        borderRadius : "8px",
-        border : "2px solid #fff",
-        background : `${borderColor}`,
-        fontSize: "14px"
-    }}>
+    <div className={`node node--${data.runStatus || "idle"}`}>
 
         <button
+        className="node__delete"
         onClick={() => deleteElements({ nodes: [{ id }] })}
-        style={{
-          position: "absolute",
-          top: "-10px",
-          right: "-10px"
-        }}
+        aria-label="Delete node"
       >
         ×
       </button>
 
-<Handle type="target" position={Position.Left}/>   
-<strong>{data.label}</strong>
-<Handle type="source" position={Position.Right}/>   
+<Handle type="target" position={Position.Left}/>
+<div className="node__label">
+  <span className="node__dot" />
+  <strong>{data.label}</strong>
+</div>
+<Handle type="source" position={Position.Right}/>
 
     </div>
 )

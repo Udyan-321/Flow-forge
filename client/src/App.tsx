@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./components.css";
 
 function App(){
  console.log("APP RENDERING");
@@ -48,23 +49,40 @@ useEffect(()=>{
 
 
   return (
-   <div style={{width : "100vw" , height : "100vw"}}>
-    <div style={{ position: "absolute", zIndex: 10, padding: "10px" }}>{message}</div>
-<h2>Your Workflows</h2>
+   <div className="page">
+    {message && <div className="banner">{message}</div>}
+
+    <div className="page__body">
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Your workflows</h2>
+          <p className="page-subtitle">{workflows.length} total</p>
+        </div>
+        <button className="btn btn--primary" onClick={()=>navigate(`/workflow/new`)}>+ New workflow</button>
+      </div>
+
+      {workflows.length === 0 && (
+        <div className="empty-state">No workflows yet — create one to get started.</div>
+      )}
+
+      <div className="list">
         {workflows.map ((flow)=>(
             <div
                 key = {flow.id}
-                onClick = { ()=> navigate(`/workflow/${flow.id}`)}
-                style={{ border: "1px solid #ccc", padding: "10px", marginBottom: "8px", cursor: "pointer" }}>
-            <div>Name : {flow.name}</div>
-            <div>Created : {flow.createdAt}</div>
-            <div>Updated : {flow.updatedAt}</div>
-        
-            
-   </div>
-  
+                className="list-row"
+                onClick = { ()=> navigate(`/workflow/${flow.id}`)}>
+              <div className="list-row__main">
+                <div className="list-row__title">{flow.name}</div>
+                <div className="list-row__meta">
+                  <span>created {flow.createdAt}</span>
+                  <span>updated {flow.updatedAt}</span>
+                </div>
+              </div>
+              <span className="list-row__chevron">›</span>
+            </div>
         ))}
-        <button onClick={()=>navigate(`/workflow/new`)}>Create</button>
+      </div>
+    </div>
    </div>
   )
 

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState , useEffect } from "react";
+import "./components.css";
 
 function AuthGate({children} : {children : React.ReactNode})
 {
@@ -24,15 +25,18 @@ useEffect(()=>{
 
 if(checkauth === "loading")
     return ( 
-    <p>Loading...</p>
+    <div className="authgate">
+      <span className="authgate__mark">flow-forge · loading…</span>
+    </div>
 )
 
 if(checkauth === "guest")
 {
     return (
-        <div>
-            <p>Login to continue</p>
-            <a href="http://localhost:5000/auth/github">Login with Github</a>
+        <div className="authgate">
+            <span className="authgate__mark">flow-forge</span>
+            <p className="authgate__text">Sign in to continue</p>
+            <a className="btn btn--primary" href="http://localhost:5000/auth/github">Continue with GitHub</a>
         </div>
 
     )

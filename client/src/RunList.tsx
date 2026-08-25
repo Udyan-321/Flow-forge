@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState , useEffect} from "react";
 import { useParams , useNavigate } from "react-router-dom";
+import "./components.css";
 
 function RunList(){
 
@@ -31,25 +32,38 @@ useEffect(()=>{
 
 if(!workflowId || runs.length === 0)
 return(
-    <div>No past runs</div>
+    <div className="page">
+      <div className="page__body">
+        <div className="empty-state">No past runs</div>
+      </div>
+    </div>
 )
 
 return (
-    <div>
-        <h2>Past Runs</h2>
+    <div className="page">
+      <div className="page__body">
+        <div className="page-header">
+          <h2 className="page-title">Past runs</h2>
+        </div>
+        <div className="list">
         {runs.map ((run)=>(
             <div
                 key = {run.id}
-                onClick = { ()=> navigate(`/runs/${run.id}`)}
-                style={{ border: "1px solid #ccc", padding: "10px", marginBottom: "8px", cursor: "pointer" }}>
-            <div>Status : {run.status}</div>
-            <div>Started : {run.startedAt}</div>
-            
+                className="list-row"
+                onClick = { ()=> navigate(`/runs/${run.id}`)}>
+              <div className="list-row__main">
+                <div className="list-row__title">
+                  <span className={`badge badge--${run.status === "completed" ? "ok" : run.status === "failed" ? "err" : run.status === "started" ? "warn" : "idle"}`}>{run.status}</span>
+                </div>
+                <div className="list-row__meta">
+                  <span>started {run.startedAt}</span>
+                </div>
+              </div>
+              <span className="list-row__chevron">›</span>
             </div>
         ))}
-
-
-
+        </div>
+      </div>
     </div>
 )
 

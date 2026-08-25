@@ -20,6 +20,8 @@ import { useNavigate , useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import SlackNotifNode from "./SlackNotifNode";
 import DiffQualityConditionalNode from "./DiffQualityConditionalNode";
+import "./components.css";
+import "./nodes.css";
 const nodeTypes = {githubTrigger : GithubTriggerNode , aiReview : AiReviewNode , postComment : PostCommentNode , slackNotif : SlackNotifNode , diffQualityConditional: DiffQualityConditionalNode };
 const initialNodes : Node[] =[];
 
@@ -162,32 +164,39 @@ loadWorkflow();
 }, [workflowId , isCreate]);
 
 
-      return (
-         <div style={{width : "100vw" , height : "100vw"}}>
-          <div style={{display: "flex", alignItems: "center", gap: "40px", justifyContent: "center"}} >
-           
+           return (
+         <div className="page canvas-page">
+          <div className="canvas-toolbar">
             {
-          !isCreate && (<button onClick={()=> navigate(`/workflow/${workflowId}/runs`)}>View Past Runs</button>)   
+          !isCreate && (<button className="btn btn--ghost" onClick={()=> navigate(`/workflow/${workflowId}/runs`)}>View past runs</button>)
 }
-           
-          <input type="text" name="" placeholder="Enter workflow name" value={workflowname} onChange={(e)=>(setworkflowname(e.target.value))} id="" />
-          <button onClick={onSave}>Save</button>
-</div>
-<br />
-          <div style={{  padding: "10px" }}>{message}</div>
-          <select name="Add Nodes" value={""} id="" style={{marginLeft: "10px"}} 
+
+          <input
+            type="text"
+            className="input canvas-toolbar__title-input"
+            placeholder="Enter workflow name"
+            value={workflowname}
+            onChange={(e)=>(setworkflowname(e.target.value))}
+          />
+
+          <select className="select" value={""}
           onChange={(e)=>(addNode(e.target.value))}>
-            <option disabled value="">Add node</option>
+            <option disabled value="">+ Add node</option>
             <option value="githubTrigger" >githubTrigger</option>
             <option value="aiReview" >aiReview</option>
             <option value="diffQualityConditional" >diffQualityConditional</option>
             <option value="postComment" >postComment</option>
             <option value="slackNotif" >slackNotif</option>
-            
           </select>
-          
-         <br />
-         
+
+          {message && <span className="canvas-toolbar__status">{message}</span>}
+
+          <span className="canvas-toolbar__spacer" />
+
+          <button className="btn btn--primary" onClick={onSave}>Save</button>
+          </div>
+
+          <div className="canvas-area">
       <ReactFlow
       nodes={nodes.map((node) => ({
     ...node,
@@ -202,6 +211,7 @@ loadWorkflow();
       <Background/>
       <Controls/>
       </ReactFlow>
+          </div>
          </div>
         )
       

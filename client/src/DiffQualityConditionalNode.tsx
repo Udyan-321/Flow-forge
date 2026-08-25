@@ -1,28 +1,29 @@
-import { Handle, Position } from "@xyflow/react";
+import { Handle, Position , useReactFlow } from "@xyflow/react";
+import "./nodes.css"
 
 function DiffQualityConditionalNode({ id, data }: { id: string; data: { label: string; runStatus?: string } })
 {
-  const borderColor = data.runStatus === "started" ? "orange"
-    : data.runStatus === "completed" ? "green"
-    : data.runStatus === "failed" ? "red"
-    : "#686927";
-
+   const {deleteElements} = useReactFlow();
   return (
-    <div style={{
-      padding: "10px 15px",
-      borderRadius: "8px",
-      border: `2px solid #ffffff`,
-      background: `${borderColor}`,
-      fontSize: "14px"
-    }}>
+    <div className={`node node--${data.runStatus || "idle"}`}>
+      <button
+        className="node__delete"
+        onClick={() => deleteElements({ nodes: [{ id }] })}
+        aria-label="Delete node"
+      >
+        ×
+      </button>
       <Handle type="target" position={Position.Left} />
-      <strong>{data.label}</strong>
+      <div className="node__label">
+        <span className="node__dot" />
+        <strong>{data.label}</strong>
+      </div>
 
-      <Handle type="source" position={Position.Bottom} id="yes" style={{ left: "25%", background: "green" }} />
-      <div style={{ fontSize: "10px", position: "absolute", bottom: "-18px", left: "10%" }}>Yes</div>
+      <Handle type="source" position={Position.Bottom} id="yes" className="node__handle-yes" style={{ left: "25%" }} />
+      <div className="node__branch-label node__branch-label--yes">Yes</div>
 
-      <Handle type="source" position={Position.Bottom} id="no" style={{ left: "75%", background: "red" }} />
-      <div style={{ fontSize: "10px", position: "absolute", bottom: "-18px", left: "65%" }}>No</div>
+      <Handle type="source" position={Position.Bottom} id="no" className="node__handle-no" style={{ left: "75%" }} />
+      <div className="node__branch-label node__branch-label--no">No</div>
     </div>
   );
 }

@@ -1,39 +1,30 @@
 import {Handle , Position , useReactFlow} from "@xyflow/react"
+import "./nodes.css"
 
 function SlackNotifNode({id ,data} : {id : string ; data :{ label :string ; slackUrl?:string ; runStatus?:string}})
 {
     const {updateNodeData , deleteElements} = useReactFlow();
 
-    const borderColor = data.runStatus === "started" ? "orange"
-  : data.runStatus === "completed" ? "green"
-  : data.runStatus === "failed" ? "red"
-  : "#2c2a8a"; 
 return(
-    <div style={{
-        padding : "10px 15px",
-        borderRadius : "8px",
-        border : "2px solid #fff",
-        background : `${borderColor}`,
-        fontSize: "14px"
-    }}>
+    <div className={`node node--${data.runStatus || "idle"}`}>
 
 <button
+        className="node__delete"
         onClick={() => deleteElements({ nodes: [{ id }] })}
-        style={{
-          position: "absolute",
-          top: "-10px",
-          right: "-10px"
-        }}
+        aria-label="Delete node"
       >
         ×
       </button>
-      
-<Handle type="target" position={Position.Left}/>   
-<strong>{data.label}</strong>
-<input type="text" name="slackUrl" id="" value={data.slackUrl || ""} onChange={(e)=>(
+
+<Handle type="target" position={Position.Left}/>
+<div className="node__label">
+  <span className="node__dot" />
+  <strong>{data.label}</strong>
+</div>
+<input className="node__input" type="text" name="slackUrl" placeholder="Slack webhook URL" value={data.slackUrl || ""} onChange={(e)=>(
     updateNodeData(id , {slackUrl : e.target.value})
 )}></input>
-<Handle type="source" position={Position.Right}/>   
+<Handle type="source" position={Position.Right}/>
 
     </div>
 )
