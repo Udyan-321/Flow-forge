@@ -1,0 +1,6 @@
+used cors so that the browser would allow js of 5173 to read response of 5000, i.e. let js running on one origin to read response of another origin
+
+
+used adapter as new version of prisma didnt  directly talk to the database
+
+rule of hooks is that hooks must run in same order , every single render  , no exceptions
