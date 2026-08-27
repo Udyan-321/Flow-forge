@@ -1,7 +1,6 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import prisma from "./prismaclient";
-import groq from "./groqClient";
 import webhookQueue from "./queue";
 import "./worker";
 dotenv.config();
@@ -13,8 +12,7 @@ import requireAuth, { AuthRequest } from "./middleware/auth";
 import cookieParser from "cookie-parser";
 import { encrypt, decrypt } from "./utils/crypto";
 import createGithubWebhook from "./githubWebhook";
-
-
+import deleteGithubWebhook from "./deletewebhook";
 
 app.use(cookieParser());
 app.use(express.json({
@@ -27,6 +25,35 @@ app.use(cors({ origin: "http://localhost:5173" ,
   credentials : true
 }));
 
+function parseCookies(cookieHeader: string): Record<string, string> {
+  return Object.fromEntries(
+    cookieHeader.split(';').map(c => {
+      const [key, ...v] = c.trim().split('=');
+      return [key, decodeURIComponent(v.join('='))];
+    })
+  );
+}
+
+io.use((socket, next) => {
+  try {
+    const cookies = parseCookies(socket.handshake.headers.cookie || '');
+    const token = cookies.token;
+
+    if (!token) {
+      return next(new Error('Unauthorized'));
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+    socket.data.userId = decoded.userId;
+    next();
+  } catch (err) {
+    next(new Error('Unauthorized'));
+  }
+});
+
+
+
+
 io.on("connection" , (socket)=>{
   console.log("A user is connected" , socket.id);
 
@@ -34,9 +61,51 @@ io.on("connection" , (socket)=>{
     console.log("User is disconnected" , socket.id);
   })
 
+  socket.on('join-workflow', async (workflowId) => {
+  const workflow = await prisma.workflow.findUnique({
+    where: { id: workflowId },
+  });
+
+  if (!workflow || workflow.userId !== socket.data.userId) {
+    return socket.emit('error', 'Unauthorized');
+  }
+
+  socket.join(`workflow:${workflowId}`);
+});
   
 });
 
+
+
+const clearUnwatchedWebhooks = async (repositoryName:string , userId:string)=>{
+const watchcount = await prisma.workflow.count({
+  where:{repository : repositoryName
+  }
+});
+if(watchcount === 1)
+{
+  const [owner, repoName] = repositoryName.split("/");
+  const user = await prisma.user.findUnique({
+    where :{id : userId}
+  });
+  if(!user?.githubAccessToken)
+  {
+    return ;
+  }
+  const token = decrypt(user?.githubAccessToken);
+  const reporow = await prisma.repowebhook.findUnique({
+    where:{repository: repositoryName}
+  });
+  const hookId = reporow?.githubHookId;
+
+  await deleteGithubWebhook(owner , repoName , hookId as number, token);
+
+   await prisma.repowebhook.delete({
+    where:{repository: repositoryName}
+  });
+}
+
+}
 
 
 app.get("/user/repos" ,requireAuth, async (req:AuthRequest , res)=>{
@@ -164,6 +233,22 @@ catch(err){
 app.put("/workflow/:id" ,requireAuth, async (req:AuthRequest , res)=>{
 const id =  req.params.id as string;
 try{
+const flow = await prisma.workflow.findUnique(
+  {
+    where : { id : id as string  ,
+      userId : req.userId
+     },
+   
+    }
+);
+if(!flow)
+{
+  return res.status(404).json({error : "Workflow not found or not authorised"})
+}
+if(flow.repository && flow.repository!= req.body.repository)
+{
+ await clearUnwatchedWebhooks(flow?.repository , req.userId as string);
+}
 
 const newflow = await prisma.workflow.updateMany(
   {
@@ -219,6 +304,50 @@ catch(err){
   res.status(500).json({error:"Something went wrong"});
 }
 });
+
+
+
+app.delete("/workflow/:id" ,requireAuth, async (req:AuthRequest,res)=>{
+  try{
+  if(!req.params.id)
+    return res.json("Invalid workflow id");
+  
+  const workflowid = req.params.id 
+
+  const flow = await prisma.workflow.findUnique(
+  {
+    where : { id : workflowid as string  ,
+      userId : req.userId
+     },
+   
+    }
+);
+if(!flow)
+{
+  return res.status(404).json({error : "Workflow not found or not authorised"})
+}
+if(flow.repository )
+{
+await clearUnwatchedWebhooks(flow?.repository , req.userId as string);
+}
+ const deletedflow = await prisma.workflow.deleteMany({
+    where:{id:req.params.id as string,
+      userId: req.userId 
+    }
+  });
+  if(deletedflow.count === 0)
+    return res.status(404).json("Workflow not found or not authorised");
+
+  
+
+  res.status(204).end();
+  }
+  catch(err)
+  {
+    console.log(err)
+    res.status(500).json({error : "Something went wrong"})
+  }
+})
 
 
 app.get("/workflow/:workflowId/runs" ,   requireAuth , async (req: AuthRequest , res)=>

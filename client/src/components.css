@@ -286,3 +286,31 @@
     display: none;
   }
 }
+
+.workflow__delete {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .15s, color .15s, border-color .15s;
+}
+ .workflow__delete {
+  opacity: 1;
+}
+.workflow__delete:hover {
+  color: var(--err);
+  border-color: var(--err);
+}

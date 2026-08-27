@@ -5,12 +5,12 @@ import { io } from "socket.io-client";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./components.css";
-
 function App(){
  console.log("APP RENDERING");
   const [message , setmessage] = useState("");
   const [workflows , setworkflows] = useState([]);
   const navigate = useNavigate();
+ 
   
 useEffect(()=>{
 const socket  = io("http://localhost:5000");
@@ -45,7 +45,17 @@ useEffect(()=>{
 }, [])
 
 
-
+const deleteWorkflow =  async(id:string)=>{
+  try{
+     await axios.delete(`http://localhost:5000/workflow/${id}`);
+    setworkflows(current => current.filter(f => f.id !== id))
+  }
+  catch(err)
+  {
+    console.log(err);
+    setmessage("Something went wrong ")
+  }
+}
 
 
   return (
@@ -71,6 +81,17 @@ useEffect(()=>{
                 key = {flow.id}
                 className="list-row"
                 onClick = { ()=> navigate(`/workflow/${flow.id}`)}>
+                  
+        <button
+        className="workflow__delete"
+        onClick={(e) => {
+    e.stopPropagation();
+    deleteWorkflow(flow.id);
+  }}
+        aria-label="Delete node"
+      >
+        ×
+      </button>
               <div className="list-row__main">
                 <div className="list-row__title">{flow.name}</div>
                 <div className="list-row__meta">

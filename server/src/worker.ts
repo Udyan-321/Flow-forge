@@ -140,6 +140,7 @@ const workflow = await prisma.workflow.findUnique({
 if(!workflow)
   return ;
 const accessToken = decrypt(workflow?.user.githubAccessToken);
+const workflowId = workflow.id;
 const {nodes , edges} = workflow?.canvasData as {nodes: any[] , edges : any[]};
 let context : WorkflowContext = {owner , repoName , prNumber , accessToken};
 let currentNode = nodes.find((n) => n.type === "githubTrigger");
@@ -167,7 +168,7 @@ while(currentNode){
       status : "started"
     }
   })
-   io.emit("workflow-progress",
+   io.to(`workflow:${workflowId}`).emit('workflow-progress',
     {
       workflowId : job.data.workflowId,
       nodeId : nextNode.id,
@@ -193,7 +194,7 @@ context = await handler(context , nextNode);
     });
     }
     
-    io.emit("workflow-progress",
+    io.to(`workflow:${workflowId}`).emit('workflow-progress',
     {
       workflowId : job.data.workflowId,
       nodeId : nextNode.id,
@@ -203,7 +204,7 @@ context = await handler(context , nextNode);
    }
    catch(err){
     console.log(err)
-    io.emit("workflow-progress",
+   io.to(`workflow:${workflowId}`).emit('workflow-progress',
     {
       workflowId : job.data.workflowId,
       nodeId : nextNode.id,

@@ -44,21 +44,42 @@ const [message , setmessage] = useState("Waiting for trigger");
       );
 
 
-      useEffect(()=>{
-const socket  = io("http://localhost:5000");
+     useEffect(() => {
+  const socket = io("http://localhost:5000", {
+    withCredentials: true
+  });
 
+  socket.on("connect", () => {
+    console.log("Socket connected:", socket.id);
 
-socket.on("workflow-progress", (data) => {
-  if (data.workflowId === workflowId) {
-    setmessage(JSON.stringify(data));
-    setNodeStatuses((current) => ({ ...current, [data.nodeId]: data.status }));
-  }
-});
+    if (workflowId && workflowId !== "new") {
+      socket.emit("join-workflow", workflowId);
+    }
+  });
 
-return ()=>{
-  socket.disconnect();
-}
-} ,[workflowId]);
+  socket.on("workflow-progress", (data) => {
+    if (data.workflowId === workflowId) {
+      setmessage(JSON.stringify(data));
+
+      setNodeStatuses((current) => ({
+        ...current,
+        [data.nodeId]: data.status
+      }));
+    }
+  });
+
+  socket.on("error", (message) => {
+    console.log("Socket error:", message);
+  });
+
+  socket.on("connect_error", (err) => {
+    console.log("Socket authentication failed:", err.message);
+  });
+
+  return () => {
+    socket.disconnect();
+  };
+}, [workflowId]);
 
 
 

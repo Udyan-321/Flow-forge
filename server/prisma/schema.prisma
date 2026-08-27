@@ -41,7 +41,7 @@ model Workflow {
 model WorkflowRun {
   id            String  @id @default(uuid())
   workflowId    String
-  workflow      Workflow   @relation(fields : [workflowId] , references: [id])
+  workflow      Workflow   @relation(fields : [workflowId] , references: [id] , onDelete : Cascade)
   status        String
   noderuns      NodeRun[]
   startedAt     DateTime @default(now())
@@ -52,7 +52,7 @@ model WorkflowRun {
 model NodeRun {
    id            String  @id @default(uuid())
    workflowRunId String
-   workflowrun   WorkflowRun  @relation(fields : [workflowRunId] , references: [id])
+   workflowrun   WorkflowRun  @relation(fields : [workflowRunId] , references: [id] , onDelete : Cascade)
    nodeId        String
    status        String
    reviewText      String?
