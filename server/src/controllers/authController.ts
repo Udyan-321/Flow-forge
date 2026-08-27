@@ -12,7 +12,7 @@ export async function githubCallback(req: Request, res: Response) {
   try {
     const token = await authenticateWithGithub(code);
     res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", maxAge: 7 * 24 * 60 * 60 * 1000 });
-    res.redirect("http://localhost:5173");
+    res.redirect(process.env.CLIENT_URL as string);
   } catch (error: any) {
     console.error(error);
     if (error.tokenData) return res.status(400).json(error.tokenData);
