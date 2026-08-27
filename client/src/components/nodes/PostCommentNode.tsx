@@ -1,0 +1,3 @@
+import { Handle, Position, useReactFlow } from "@xyflow/react";
+import "../../styles/nodes.css";
+export default function PostCommentNode({ id, data }: { id: string; data: { label: string; repo?: string; runStatus?: string } }) { const { deleteElements } = useReactFlow(); return <div className={`node node--${data.runStatus || "idle"}`}><button className="node__delete" onClick={() => deleteElements({ nodes: [{ id }] })} aria-label="Delete node">×</button><Handle type="target" position={Position.Left} /><div className="node__label"><span className="node__dot" /><strong>{data.label}</strong></div><Handle type="source" position={Position.Right} /></div>; }

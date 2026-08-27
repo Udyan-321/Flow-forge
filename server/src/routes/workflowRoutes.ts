@@ -1,0 +1,11 @@
+import { Router } from "express";
+import requireAuth from "../middleware/auth";
+import * as controller from "../controllers/workflowController";
+const router = Router();
+router.get("/user/repos", requireAuth, controller.listRepositories);
+router.post("/workflow/create", requireAuth, controller.create);
+router.get("/workflows", requireAuth, controller.list);
+router.get("/workflow/:id", requireAuth, controller.get);
+router.put("/workflow/:id", requireAuth, controller.update);
+router.delete("/workflow/:id", requireAuth, controller.remove);
+export default router;
