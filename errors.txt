@@ -4,3 +4,7 @@ used cors so that the browser would allow js of 5173 to read response of 5000, i
 used adapter as new version of prisma didnt  directly talk to the database
 
 rule of hooks is that hooks must run in same order , every single render  , no exceptions
+
+database_url = postgresql://flow_forge_db_user:c4SYPjefhP6vN87qOm8vhBTAfDnSM2wK@dpg-da84a0rbc2fs73coa3ag-a/flow_forge_db
+
+redis_url =redis://red-da84cjm7bikc7394k6mg:6379

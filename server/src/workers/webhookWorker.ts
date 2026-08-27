@@ -1,4 +1,5 @@
 import { Worker } from "bullmq";
 import { executeWorkflow } from "../services/workflowEngine/executeWorkflow";
-
-export const webhookWorker = new Worker("webhook-events", executeWorkflow, { connection: { host: "localhost", port: 6379 } });
+import connection from "../lib/redisConnection";
+export const webhookWorker = new Worker("webhook-events", executeWorkflow, {
+    connection });

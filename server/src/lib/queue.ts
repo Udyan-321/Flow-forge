@@ -1,10 +1,7 @@
 import { Queue } from "bullmq";
-
+import connection from "./redisConnection"; 
 const webhookQueue = new Queue("webhook-events", {
-  connection: {
-    host: "localhost",
-    port: 6379,
-  },
+  connection
 });
 
 export default webhookQueue;
