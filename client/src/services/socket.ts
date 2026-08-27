@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
 
 export function createSocket() {
-  return io("http://localhost:5000", { withCredentials: true });
+  return io(import.meta.env.VITE_SERVER_URL, { withCredentials: true });
 }

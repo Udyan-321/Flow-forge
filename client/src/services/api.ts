@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const api = axios.create({ baseURL: "http://localhost:5000", withCredentials: true });
+const api = axios.create({ baseURL: import.meta.env.VITE_SERVER_URL, withCredentials: true });
 
 export const fetchWorkflows = () => api.get("/workflows");
 export const deleteWorkflow = (id: string) => api.delete(`/workflow/${id}`);
