@@ -3,7 +3,8 @@ import { Response, NextFunction } from "express";
 import { AuthRequest } from "../types/auth";
 
 export function requireAuth(req: AuthRequest, res: Response, next: NextFunction) {
-  const token = req.cookies?.token;
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
 
   if (!token) {
     return res.status(401).json({ error: "Not authenticated" });
@@ -18,4 +19,4 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
   }
 }
 
-export default requireAuth; 
+export default requireAuth;

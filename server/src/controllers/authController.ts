@@ -11,8 +11,8 @@ export async function githubCallback(req: Request, res: Response) {
   if (!code) return res.status(400).send("Missing code from GitHub");
   try {
     const token = await authenticateWithGithub(code);
-    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none", maxAge: 7 * 24 * 60 * 60 * 1000 });
-    res.redirect(process.env.CLIENT_URL as string);
+    res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}`);
+  
   } catch (error: any) {
     console.error(error);
     if (error.tokenData) return res.status(400).json(error.tokenData);
