@@ -9,7 +9,10 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
-
+export function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/"; 
+}
 export const fetchWorkflows = () => api.get("/workflows");
 export const deleteWorkflow = (id: string) => api.delete(`/workflow/${id}`);
 export const fetchWorkflow = (id: string) => api.get(`/workflow/${id}`);
