@@ -2,7 +2,7 @@
 
 A visual, drag-and-drop automation builder for the GitHub PR lifecycle — AI-powered code review, severity-based branching, Slack alerts, and auto-comments, all orchestrated on a real job queue.
 
-![Flow Forge demo](./docs/Animation.gif)
+![Flow Forge demo](./docs/FlowAnimation.gif)
 
 ## What it does
 
